@@ -71,13 +71,17 @@ flagsは最大4件まで。該当箇所がなければ空配列でよい。`;
 
     const data = await response.json();
     const raw = data.content.map((b) => b.text || "").join("").trim();
-    const clean = raw
-      .replace(/^
-json\s*/i, "")
-      .replace(/^
-\s*/i, "")
-      .replace(/
-\s*$/i, "")      .trim();
+
+    // コードフェンス(```json や ```)を安全に取り除く（正規表現を使わない）
+    let clean = raw;
+    if (clean.startsWith("```")) {
+      const firstNewline = clean.indexOf("\n");
+      clean = firstNewline !== -1 ? clean.slice(firstNewline + 1) : clean.slice(3);
+    }
+    if (clean.endsWith("```")) {
+      clean = clean.slice(0, -3);
+    }
+    clean = clean.trim();
 
     const parsed = JSON.parse(clean);
 
