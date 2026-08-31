@@ -49,7 +49,7 @@ exports.handler = async function (event) {
 
 flagsは最大4件まで。該当箇所がなければ空配列でよい。`;
 
-  const model = "gemini-2.5-flash";
+  const model = "gemini-3.6-flash";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   try {
@@ -92,12 +92,11 @@ flagsは最大4件まで。該当箇所がなければ空配列でよい。`;
     }
 
     let clean = raw.trim();
-    if (clean.startsWith("```")) {
+    if (clean.startsWith("")) {
       const firstNewline = clean.indexOf("\n");
       clean = firstNewline !== -1 ? clean.slice(firstNewline + 1) : clean.slice(3);
     }
-    if (clean.endsWith("```")) {
-      clean = clean.slice(0, -3);
+    if (clean.endsWith("")) {      clean = clean.slice(0, -3);
     }
     clean = clean.trim();
 
