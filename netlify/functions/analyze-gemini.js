@@ -68,6 +68,9 @@ flagsは最大4件まで。該当箇所がなければ空配列でよい。`;
         ],
         generationConfig: {
           responseMimeType: "application/json",
+          thinkingConfig: {
+            thinkingLevel: "minimal",
+          },
         },
       }),
     });
