@@ -32,13 +32,13 @@ exports.handler = async function (event) {
 
 出力形式:
 {
-  "score": 0から100の整数（100が最も丁寧、0が最も失礼・雑）,
-  "verdict_short": "判定を表す漢字2〜4文字（例: 丁寧, 普通, 失礼, 硬すぎ, カジュアル）",
-  "verdict_label": "判定を表す短いラベル（例: ちょうどよい, やや失礼, 丁寧すぎる, カジュアルすぎる）",
+  "score": 0から100の整数(100が最も丁寧、0が最も失礼・雑),
+  "verdict_short": "判定を表す漢字2〜4文字(例: 丁寧, 普通, 失礼, 硬すぎ, カジュアル)",
+  "verdict_label": "判定を表す短いラベル(例: ちょうどよい, やや失礼, 丁寧すぎる, カジュアルすぎる)",
   "summary": "全体的な印象を1〜2文で",
   "flags": [
     {
-      "phrase": "原文から抜き出した気になる表現（15文字程度まで）",
+      "phrase": "原文から抜き出した気になる表現(15文字程度まで)",
       "type": "casual または stiff または rude",
       "note": "何が問題か、1文で",
       "suggestion": "言い換え案の表現"
@@ -87,21 +87,21 @@ flagsは最大4件まで。該当箇所がなければ空配列でよい。`;
       data.candidates[0].content &&
       data.candidates[0].content.parts &&
       data.candidates[0].content.parts[0]
-        ? data.candidates[0].content.parts[0].text
+        ? data.candidates[0].content.parts.map((p) => p.text || "").join("")
         : "";
 
     if (!raw) {
       return { statusCode: 500, body: JSON.stringify({ error: "Gemini returned an empty response." }) };
     }
 
-    let clean = raw.trim();
-    if (clean.startsWith("")) {
-      const firstNewline = clean.indexOf("\n");
-      clean = firstNewline !== -1 ? clean.slice(firstNewline + 1) : clean.slice(3);
+    // 返答の中から JSON 本体（最初の { から最後の } まで）だけを取り出す。
+    // これなら前後に余計な文字やコードフェンスが付いていても壊れない。
+    const start = raw.indexOf("{");
+    const end = raw.lastIndexOf("}");
+    if (start === -1 || end === -1 || end <= start) {
+      return { statusCode: 500, body: JSON.stringify({ error: "Gemini response did not contain JSON." }) };
     }
-    if (clean.endsWith("")) {      clean = clean.slice(0, -3);
-    }
-    clean = clean.trim();
+    const clean = raw.slice(start, end + 1);
 
     const parsed = JSON.parse(clean);
 
